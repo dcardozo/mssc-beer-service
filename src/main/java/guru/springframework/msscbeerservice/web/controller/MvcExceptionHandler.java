@@ -33,6 +33,11 @@ public class MvcExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<HttpStatus> notFoundErrorHandler(NotFoundException e) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(BindException.class)
     public ResponseEntity<List> handleBindException(BindException ex) {
         return new ResponseEntity<>(ex.getAllErrors(), HttpStatus.BAD_REQUEST);

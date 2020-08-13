@@ -1,6 +1,5 @@
 package guru.springframework.msscbeerservice.web.controller;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -18,11 +17,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import guru.springframework.msscbeerservice.bootstrap.BeerLoader;
 import guru.springframework.msscbeerservice.services.BeerService;
+import guru.springframework.msscbeerservice.services.inventory.BeerInventoryService;
 import guru.springframework.msscbeerservice.web.model.BeerDto;
-import guru.springframework.msscbeerservice.web.model.BeerStyleEnum;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -45,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs(uriScheme = "https", uriHost = "david0.apiclient.com", uriPort = 80)
 @WebMvcTest(BeerController.class)
 @ComponentScan(basePackages = "guru.springframework.msscbeerservice.web.mappers")
-class BeerControllerTest {
+class BeerControllerTest extends BaseTest {
 
     private static final String BEER_API_PATH = "/api/v1/beer/";
 
@@ -58,19 +57,22 @@ class BeerControllerTest {
     @MockBean
     BeerService beerService;
 
+    @MockBean
+    BeerInventoryService beerInventoryService;
+
     @Test
-    void getBeer() throws Exception {
-        given(beerService.getById(any())).willReturn(getValidBeerDto());
+    void getBeerById() throws Exception {
+        given(beerService.getById(any(), anyBoolean())).willReturn(getValidBeerDto());
         mockMvc.perform(get(BEER_API_PATH + "{beerId}", UUID.randomUUID().toString())
-                .param("iscold", "yes") // not used; just for RESTDocs demo purpose
+                .param("showInventoryOnHand", "true")
                 .accept(MediaType.APPLICATION_JSON))
                .andExpect(status().isOk())
-               .andDo(document("v1/beer-get",
+               .andDo(document("v1/beer-get-by-id",
                        pathParameters(
                                parameterWithName("beerId").description("UUID of desired beer to get.")
                        ),
                        requestParameters(
-                               parameterWithName("iscold").description("Is Beer Cold Query param")
+                               parameterWithName("showInventoryOnHand").description("Should show the available inventory?")
                        ),
                        responseFields(
                                fieldWithPath("id").description("Id of Beer"),
@@ -121,15 +123,6 @@ class BeerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(beerDtoJson))
                .andExpect(status().isNoContent());
-    }
-
-    BeerDto getValidBeerDto() {
-        return BeerDto.builder()
-                      .beerName("My Beer")
-                      .beerStyle(BeerStyleEnum.ALE)
-                      .price(new BigDecimal("2.99"))
-                      .upc(BeerLoader.BEER_1_UPC)
-                      .build();
     }
 
     private static class ConstrainedFields {
