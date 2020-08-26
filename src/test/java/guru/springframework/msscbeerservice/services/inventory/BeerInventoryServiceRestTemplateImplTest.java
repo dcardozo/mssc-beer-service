@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import guru.springframework.msscbeerservice.bootstrap.BeerLoader;
-import static org.junit.jupiter.api.Assertions.*;
-
 @Disabled // utility for manual testing
 @SpringBootTest
 class BeerInventoryServiceRestTemplateImplTest {
@@ -23,8 +20,9 @@ class BeerInventoryServiceRestTemplateImplTest {
 
     @Test
     void getOnHandInventory() {
-        Integer qoh = beerInventoryService.getOnHandInventory(BeerLoader.BEER_1_UUID);
 
-        System.out.println(qoh);
+//        Integer qoh = beerInventoryService.getOnHandInventory(BeerLoader.BEER_1_UUID);
+
+//        System.out.println(qoh);
     }
 }
